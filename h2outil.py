@@ -17,3 +17,9 @@ def init():
     ignore = ["DELINQUENT", "PREPAID", "PREPAYMENT_PENALTY_MORTGAGE_FLAG", "PRODUCT_TYPE"]
     x = sorted(list(set(train.names) - set(ignore)))
     return train, valid, test, x, y
+    """
+    model.plot(metric='auc')
+    model.varimp_plot(20)
+    model.accuracy()
+    model.F1()
+    """

@@ -1,44 +1,23 @@
-"""
-https://training.h2o.ai/products/1a-introduction-to-machine-learning-with-h2o-3-classification
-task 2,3,4
-"""
-#Import H2O and other libaries that will be used in this tutorial
-import h2o
-from h2o.estimators import *
-from h2o.grid import *
-import time
+from h2outil import *
 
-h2o.init()
+def rf(train, valid, test, x, y):
+    print("# ===================================")
+    print("# RANDOM FOREST")
+    print("# ===================================")
 
-#Import the dataset 
-loan_level = h2o.import_file("loan_level_500k.csv")
-loan_level.head()
-loan_level.describe()
-loan_level["DELINQUENT"].table()
-train, valid, test = loan_level.split_frame([0.7, 0.15], seed=42)
-print("train:%d valid:%d test:%d" % (train.nrows, valid.nrows, test.nrows))
+    rf = H2ORandomForestEstimator (seed = 42, model_id = 'default_rf')
+    rf.train(x = x, y = y, training_frame = train, validation_frame = valid)
+    print(rf)
 
-y = "DELINQUENT"
+    print("accuracy %s" % rf.accuracy())
+    print(rf.predict(valid).head(10))
+    
+    rf_perf=rf.model_performance(valid)
+    print("AUC %s" % rf_perf.auc())
+    print("F1 %s" % rf_perf.F1())    
+    return rf_perf
 
-ignore = ["DELINQUENT", "PREPAID", "PREPAYMENT_PENALTY_MORTGAGE_FLAG", "PRODUCT_TYPE"] 
-
-x = sorted(list(set(train.names) - set(ignore)))
-print(x)
-
-# ===================================
-# RANDOM FOREST
-# ===================================
-
-model = H2ORandomForestEstimator (seed = 42, model_id = 'default_rf')
-model.train(x = x, y = y, training_frame = train, validation_frame = valid)
-print(model)
-
-
-model.plot(metric='auc')
-model.varimp_plot(20)
-model.accuracy()
-model.F1()
-
-model.predict(valid).head(10)
-default_model_perf=model.model_performance(valid)
-print(default_model_perf.auc())
+if __name__ == "__main__":
+    train, valid, test, x, y = init()
+    rf(train, valid, test, x, y)
+    pass

@@ -1,9 +1,10 @@
 from h2outil import *
 
-# ===================================
-# GBM GRIDSEARCH2
-# ===================================
+
 def gbm_gridsearch2(train, valid, test, x, y):
+    print("# ===================================")
+    print("# GBM GRIDSEARCH2")
+    print("# ===================================")
     gbm = H2OGradientBoostingEstimator(ntrees = 500,
                                    learn_rate = 0.05,
                                    seed = 42,
@@ -27,13 +28,16 @@ def gbm_gridsearch2(train, valid, test, x, y):
     random_grid.train(x = x, y = y, training_frame = train, validation_frame = valid)
     sorted_random_search = random_grid.get_grid(sort_by = 'auc',decreasing = True)
     sorted_random_search.sorted_metric_table()
+    print("==== SORTED GBM TABLE ======================")
+    print(sorted_random_search)
+
+    print("==== PREDICT ======================")
     tuned_gbm = sorted_random_search.models[0]
     tuned_gbm_per = tuned_gbm.model_performance(valid)
-    print(tuned_gbm_per.auc())
-    print(tuned_gbm_per.F1())
+    print("AUC %s" % tuned_gbm_per.auc())
+    print("F1 %s" % tuned_gbm_per.F1())
     tuned_gbm_per.confusion_matrix()
-
-    pass
+    return tuned_gbm_per
 
 
 if __name__ == "__main__":
